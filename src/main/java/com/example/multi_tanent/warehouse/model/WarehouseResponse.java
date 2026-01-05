@@ -1,0 +1,20 @@
+package com.example.multi_tanent.warehouse.model;
+
+import lombok.*;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class WarehouseResponse {
+
+    private Long id;
+    private String code;
+    private String name;
+    private String address;
+    private String contactPerson;
+    private String contactNumber;
+    private Boolean active;
+    private Long tenantId;
+    private String tenantName;
+}
