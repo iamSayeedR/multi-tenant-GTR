@@ -14,19 +14,18 @@ public class StoreKeeperService {
 
     private final StoreKeeperRepository repo;
     private final WarehouseRepository warehouseRepo;
+    private final com.example.multi_tanent.warehouse.mapper.StoreKeeperMapper mapper;
 
-    public StoreKeeperService(StoreKeeperRepository repo, WarehouseRepository warehouseRepo) {
+    public StoreKeeperService(StoreKeeperRepository repo, WarehouseRepository warehouseRepo,
+            com.example.multi_tanent.warehouse.mapper.StoreKeeperMapper mapper) {
         this.repo = repo;
         this.warehouseRepo = warehouseRepo;
+        this.mapper = mapper;
     }
 
     public StoreKeeperResponse create(StoreKeeperRequest req) {
 
-        StoreKeeperEntity entity = new StoreKeeperEntity();
-        entity.setName(req.getName());
-        entity.setEmployeeCode(req.getEmployeeId());
-        entity.setPhone(req.getContactNumber());
-        entity.setEmail(req.getEmail());
+        StoreKeeperEntity entity = mapper.toEntity(req);
 
         WarehouseEntity wh = warehouseRepo.findById(req.getWarehouseId())
                 .orElseThrow(() -> new RuntimeException("Warehouse not found"));
@@ -35,31 +34,19 @@ public class StoreKeeperService {
 
         StoreKeeperEntity saved = repo.save(entity);
 
-        return toResponse(saved);
+        return mapper.toResponse(saved);
     }
 
     public List<StoreKeeperResponse> getAll() {
         return repo.findAll().stream()
-                .map(this::toResponse)
+                .map(mapper::toResponse)
                 .toList();
     }
 
     public List<StoreKeeperResponse> list(Long warehouseId) {
         return repo.findByWarehouseId(warehouseId)
                 .stream()
-                .map(this::toResponse)
+                .map(mapper::toResponse)
                 .toList();
-    }
-
-    private StoreKeeperResponse toResponse(StoreKeeperEntity e) {
-        StoreKeeperResponse r = new StoreKeeperResponse();
-        r.setId(e.getId());
-        r.setName(e.getName());
-        r.setEmployeeId(e.getEmployeeCode());
-        r.setContactNumber(e.getPhone());
-        r.setEmail(e.getEmail());
-        r.setWarehouseId(e.getWarehouse().getId());
-        r.setWarehouseName(e.getWarehouse().getName());
-        return r;
     }
 }

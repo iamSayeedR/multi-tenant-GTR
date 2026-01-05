@@ -21,6 +21,7 @@ public class TransferService {
         private final InventoryRepository inventoryRepository;
         private final InventoryService inventoryService;
         private final LocationService locationService;
+        private final com.example.multi_tanent.warehouse.mapper.TransferMapper transferMapper;
 
         public TransferService(LocationRepository locationRepository,
                         ItemRepository itemRepository,
@@ -29,7 +30,8 @@ public class TransferService {
                         IssueRecordRepository issueRecordRepository,
                         InventoryRepository inventoryRepository,
                         InventoryService inventoryService,
-                        LocationService locationService) {
+                        LocationService locationService,
+                        com.example.multi_tanent.warehouse.mapper.TransferMapper transferMapper) {
 
                 this.locationRepository = locationRepository;
                 this.itemRepository = itemRepository;
@@ -39,6 +41,7 @@ public class TransferService {
                 this.inventoryRepository = inventoryRepository;
                 this.inventoryService = inventoryService;
                 this.locationService = locationService;
+                this.transferMapper = transferMapper;
         }
 
         // -----------------------------------------------------------------------
@@ -91,7 +94,7 @@ public class TransferService {
                 }
 
                 transferRepository.save(t);
-                return toResponse(t);
+                return transferMapper.toResponse(t);
         }
 
         @Transactional(readOnly = true)
@@ -106,7 +109,7 @@ public class TransferService {
                 }
 
                 return list.stream()
-                                .map(this::toResponse)
+                                .map(transferMapper::toResponse)
                                 .toList();
         }
 
@@ -116,7 +119,7 @@ public class TransferService {
                 InterLocationTransfer t = transferRepository.findById(id)
                                 .orElseThrow(() -> new IllegalArgumentException("Transfer not found"));
 
-                return toResponse(t);
+                return transferMapper.toResponse(t);
         }
 
         @Transactional(readOnly = true)
@@ -244,36 +247,6 @@ public class TransferService {
                                 .ratePerUnit(rec.getRatePerUnit())
                                 .vatPercent(rec.getVatPercent())
                                 .toLocation(t.getToLocation().getName())
-                                .build();
-        }
-
-        // -----------------------------------------------------------------------
-        // Convert entity to response
-        // -----------------------------------------------------------------------
-        private TransferResponse toResponse(InterLocationTransfer t) {
-                return TransferResponse.builder()
-                                .id(t.getId())
-                                .issueNo(t.getIssueNo())
-                                .issueDate(t.getIssueDate())
-
-                                .fromLocation(t.getFromLocation().getName())
-                                .toLocation(t.getToLocation().getName())
-
-                                .fromRFIDTag(t.getFromRFIDTag())
-                                .toRFIDTag(t.getToRFIDTag())
-
-                                .status(t.getStatus())
-
-                                .lines(
-                                                t.getLines().stream().map(l -> TransferResponse.Line.builder()
-                                                                .lineId(l.getId())
-                                                                .itemCode(l.getItem().getCode())
-                                                                .itemName(l.getItem().getName())
-                                                                .requisitionQty(l.getRequisitionQty())
-                                                                .issuedQty(l.getIssuedQty())
-                                                                .ratePerUnit(l.getRatePerUnit())
-                                                                .vatPercent(l.getVatPercent())
-                                                                .build()).toList())
                                 .build();
         }
 }

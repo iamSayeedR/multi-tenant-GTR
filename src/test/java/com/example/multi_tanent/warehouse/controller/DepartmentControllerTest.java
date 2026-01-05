@@ -1,30 +1,32 @@
 package com.example.multi_tanent.warehouse.controller;
 
-import com.example.multi_tanent.warehouse.model.DepartmentRequest;
-import com.example.multi_tanent.warehouse.model.DepartmentResponse;
-import com.example.multi_tanent.warehouse.service.DepartmentService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.Arrays;
-import java.util.List;
-
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import com.example.multi_tanent.warehouse.model.DepartmentRequest;
+import com.example.multi_tanent.warehouse.model.DepartmentResponse;
+import com.example.multi_tanent.warehouse.service.DepartmentService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.util.Collections;
+import java.util.List;
+
+import lombok.SneakyThrows;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+
 @WebMvcTest(DepartmentController.class)
-@org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc(addFilters = false)
+@AutoConfigureMockMvc(addFilters = false)
 class DepartmentControllerTest {
 
     @Autowired
@@ -60,9 +62,11 @@ class DepartmentControllerTest {
     }
 
     @Test
-    void create_ShouldReturnCreatedDepartment() throws Exception {
+    @SneakyThrows
+    void ShouldReturn200WhenDepartmentIsCreated() {
+
         // Given
-        when(departmentService.create(any(DepartmentRequest.class))).thenReturn(departmentResponse);
+        when(departmentService.create(departmentRequest)).thenReturn(departmentResponse);
 
         // When/Then
         mockMvc.perform(post("/api/departments")
@@ -79,9 +83,10 @@ class DepartmentControllerTest {
     }
 
     @Test
-    void listAll_ShouldReturnAllDepartments() throws Exception {
+    @SneakyThrows
+    void ShouldReturnAllDepartments() {
         // Given
-        List<DepartmentResponse> departments = Arrays.asList(departmentResponse);
+        List<DepartmentResponse> departments = Collections.singletonList(departmentResponse);
         when(departmentService.listAll()).thenReturn(departments);
 
         // When/Then
@@ -93,7 +98,7 @@ class DepartmentControllerTest {
     }
 
     @Test
-    void getById_ShouldReturnDepartment() throws Exception {
+    void ShouldReturnDepartmentById() throws Exception {
         // Given
         when(departmentService.getById(1L)).thenReturn(departmentResponse);
 

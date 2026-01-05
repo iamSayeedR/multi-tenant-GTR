@@ -19,11 +19,14 @@ public class InventoryService {
 
     private final ItemRepository itemRepository;
 
+    private final com.example.multi_tanent.warehouse.mapper.InventoryMapper inventoryMapper;
+
     public InventoryService(InventoryRepository inventoryRepository, LocationRepository locationRepository,
-            ItemRepository itemRepository) {
+            ItemRepository itemRepository, com.example.multi_tanent.warehouse.mapper.InventoryMapper inventoryMapper) {
         this.inventoryRepository = inventoryRepository;
         this.locationRepository = locationRepository;
         this.itemRepository = itemRepository;
+        this.inventoryMapper = inventoryMapper;
     }
 
     @Transactional
@@ -112,13 +115,7 @@ public class InventoryService {
     public List<InventoryResponse> getAllInventory() {
         List<InventoryEntity> inventories = inventoryRepository.findAll();
         return inventories.stream()
-                .map(inv -> new InventoryResponse(
-                        inv.getId(),
-                        inv.getLocation().getId(),
-                        inv.getLocation().getName(),
-                        inv.getItem().getId(),
-                        inv.getItem().getName(),
-                        inv.getQuantity()))
+                .map(inventoryMapper::toResponse)
                 .collect(Collectors.toList());
     }
 

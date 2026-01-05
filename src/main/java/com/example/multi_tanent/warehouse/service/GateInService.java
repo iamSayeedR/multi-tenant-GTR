@@ -23,6 +23,7 @@ public class GateInService {
     private final RFIDMovementService rfidMovementService;
     private final WarehouseRepository warehouseRepository;
     private final GateOutRepository gateOutRepository;
+    private final com.example.multi_tanent.warehouse.mapper.GateInMapper gateInMapper;
 
     public GateInService(
             GateInRepository gateInRepository,
@@ -35,7 +36,8 @@ public class GateInService {
             InventoryService inventoryService,
             RFIDMovementService rfidMovementService,
             WarehouseRepository warehouseRepository,
-            GateOutRepository gateOutRepository) {
+            GateOutRepository gateOutRepository,
+            com.example.multi_tanent.warehouse.mapper.GateInMapper gateInMapper) {
         this.gateInRepository = gateInRepository;
         this.gateInLineRepository = gateInLineRepository;
         this.gateKeeperRepository = gateKeeperRepository;
@@ -47,6 +49,7 @@ public class GateInService {
         this.rfidMovementService = rfidMovementService;
         this.warehouseRepository = warehouseRepository;
         this.gateOutRepository = gateOutRepository;
+        this.gateInMapper = gateInMapper;
     }
 
     @Transactional
@@ -125,7 +128,7 @@ public class GateInService {
         }
 
         gateIn = gateInRepository.save(gateIn);
-        return mapToResponse(gateIn);
+        return gateInMapper.toResponse(gateIn);
     }
 
     @Transactional
@@ -165,7 +168,7 @@ public class GateInService {
         }
 
         gateIn = gateInRepository.save(gateIn);
-        return mapToResponse(gateIn);
+        return gateInMapper.toResponse(gateIn);
     }
 
     @Transactional
@@ -181,7 +184,7 @@ public class GateInService {
         gateIn.setStatus(GateInStatus.RECEIVED);
         gateIn = gateInRepository.save(gateIn);
 
-        return mapToResponse(gateIn);
+        return gateInMapper.toResponse(gateIn);
     }
 
     @Transactional
@@ -221,7 +224,7 @@ public class GateInService {
         }
 
         gateIn = gateInRepository.save(gateIn);
-        return mapToResponse(gateIn);
+        return gateInMapper.toResponse(gateIn);
     }
 
     public List<GateInResponse> listGateIns(List<GateInStatus> statuses) {
@@ -234,14 +237,14 @@ public class GateInService {
         }
 
         return gateIns.stream()
-                .map(this::mapToResponse)
+                .map(gateInMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
     public GateInResponse getGateInById(Long id) {
         GateInEntity gateIn = gateInRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Gate In not found"));
-        return mapToResponse(gateIn);
+        return gateInMapper.toResponse(gateIn);
     }
 
     /**
@@ -251,65 +254,5 @@ public class GateInService {
     private synchronized String generateGateInNo() {
         long count = gateInRepository.count();
         return "GIN-" + String.format("%06d", count + 1);
-    }
-
-    private GateInResponse mapToResponse(GateInEntity entity) {
-//        GateInResponse response = new GateInResponse();
-//        response.setId(entity.getId());
-//        response.setGateInNo(entity.getGateInNo());
-//        response.setTimestamp(entity.getTimestamp());
-//        response.setVehicleNo(entity.getVehicleNo());
-//        response.setRemarks(entity.getRemarks());
-//        response.setStatus(entity.getStatus());
-
-//        if (entity.getGateKeeper() != null) {
-//            response.setGateKeeperId(entity.getGateKeeper().getId());
-//            response.setGateKeeperName(entity.getGateKeeper().getName());
-//        }
-//
-//        if (entity.getStoreKeeper() != null) {
-//            response.setStoreKeeperId(entity.getStoreKeeper().getId());
-//            response.setStoreKeeperName(entity.getStoreKeeper().getName());
-//        }
-//
-//        // Map source warehouse
-//        if (entity.getSourceWarehouse() != null) {
-//            response.setSourceWarehouseId(entity.getSourceWarehouse().getId());
-//            response.setSourceWarehouseName(entity.getSourceWarehouse().getName());
-//        }
-//
-//        // Map supplier info
-//        response.setSupplierName(entity.getSupplierName());
-//        response.setSupplierAddress(entity.getSupplierAddress());
-//
-//        // Map reference Gate Out
-//        if (entity.getReferenceGateOut() != null) {
-//            response.setReferenceGateOutId(entity.getReferenceGateOut().getId());
-//            response.setReferenceGateOutNo(entity.getReferenceGateOut().getGateOutNo());
-//        }
-//
-//        List<GateInLineResponse> lineResponses = entity.getLines().stream()
-//                .map(this::mapLineToResponse)
-//                .collect(Collectors.toList());
-//        response.setLines(lineResponses);
-
-        return GateInResponse.builder().build();
-    }
-
-    private GateInLineResponse mapLineToResponse(GateInLineEntity entity) {
-        GateInLineResponse response = new GateInLineResponse();
-        response.setId(entity.getId());
-        response.setItemId(entity.getItem().getId());
-        response.setItemName(entity.getItem().getName());
-        response.setRfidTagCode(entity.getRfidTagCode());
-        response.setQty(entity.getQty());
-
-        // Only toLocation is relevant for Gate In
-        if (entity.getToLocation() != null) {
-            response.setToLocationId(entity.getToLocation().getId());
-            response.setToLocationName(entity.getToLocation().getName());
-        }
-
-        return response;
     }
 }

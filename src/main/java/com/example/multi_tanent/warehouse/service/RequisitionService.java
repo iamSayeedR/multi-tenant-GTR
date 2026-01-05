@@ -23,6 +23,7 @@ public class RequisitionService {
     private final ServiceRepository serviceRepository;
     private final ExpenseItemRepository expenseItemRepository;
     private final InventoryService inventoryService;
+    private final com.example.multi_tanent.warehouse.mapper.RequisitionMapper mapper;
 
     public RequisitionService(
             RequisitionRepository requisitionRepository,
@@ -34,7 +35,8 @@ public class RequisitionService {
             ItemRepository itemRepository,
             ServiceRepository serviceRepository,
             ExpenseItemRepository expenseItemRepository,
-            InventoryService inventoryService) {
+            InventoryService inventoryService,
+            com.example.multi_tanent.warehouse.mapper.RequisitionMapper mapper) {
         this.requisitionRepository = requisitionRepository;
         this.departmentRepository = departmentRepository;
         this.employeeRepository = employeeRepository;
@@ -45,6 +47,7 @@ public class RequisitionService {
         this.serviceRepository = serviceRepository;
         this.expenseItemRepository = expenseItemRepository;
         this.inventoryService = inventoryService;
+        this.mapper = mapper;
     }
 
     @Transactional
@@ -105,7 +108,7 @@ public class RequisitionService {
         calculateTotalAmount(requisition);
 
         requisition = requisitionRepository.save(requisition);
-        return mapToResponse(requisition);
+        return mapper.toResponse(requisition);
     }
 
     private RequisitionLineEntity createLine(RequisitionEntity requisition, RequisitionLineRequest lineReq,
@@ -185,7 +188,7 @@ public class RequisitionService {
         requisition.setStatus(RequisitionStatus.WAITING_FOR_PROCESSING);
         requisition = requisitionRepository.save(requisition);
 
-        return mapToResponse(requisition);
+        return mapper.toResponse(requisition);
     }
 
     @Transactional
@@ -200,7 +203,7 @@ public class RequisitionService {
         requisition.setStatus(RequisitionStatus.APPROVED);
         requisition = requisitionRepository.save(requisition);
 
-        return mapToResponse(requisition);
+        return mapper.toResponse(requisition);
     }
 
     @Transactional
@@ -212,7 +215,7 @@ public class RequisitionService {
         requisition.setComment(requisition.getComment() + "\nREJECTED: " + reason);
         requisition = requisitionRepository.save(requisition);
 
-        return mapToResponse(requisition);
+        return mapper.toResponse(requisition);
     }
 
     public List<RequisitionResponse> listRequisitions(String status) {
@@ -226,113 +229,18 @@ public class RequisitionService {
         }
 
         return requisitions.stream()
-                .map(this::mapToResponse)
+                .map(mapper::toResponse)
                 .collect(Collectors.toList());
     }
 
     public RequisitionResponse getRequisitionById(Long id) {
         RequisitionEntity requisition = requisitionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Requisition not found"));
-        return mapToResponse(requisition);
+        return mapper.toResponse(requisition);
     }
 
     private synchronized String generateRequisitionNo() {
         long count = requisitionRepository.count();
         return "REQ-" + String.format("%06d", count + 1);
-    }
-
-    private RequisitionResponse mapToResponse(RequisitionEntity entity) {
-        RequisitionResponse response = new RequisitionResponse();
-        response.setId(entity.getId());
-        response.setRequisitionNo(entity.getRequisitionNo());
-        response.setRequiredDate(entity.getRequiredDate());
-        response.setStatus(entity.getStatus().name());
-        response.setFromDate(entity.getFromDate());
-        response.setComment(entity.getComment());
-        response.setCustomerOrderId(entity.getCustomerOrderId());
-        response.setBasisType(entity.getBasisType());
-        response.setBasisId(entity.getBasisId());
-        response.setTotalAmount(entity.getTotalAmount());
-        response.setCreatedAt(entity.getCreatedAt());
-        response.setUpdatedAt(entity.getUpdatedAt());
-
-        if (entity.getEntity() != null) {
-            response.setEntityId(entity.getEntity().getId());
-            response.setEntityName(entity.getEntity().getName());
-        }
-
-        if (entity.getRecipient() != null) {
-            response.setRecipientId(entity.getRecipient().getId());
-            response.setRecipientName(entity.getRecipient().getName());
-        }
-
-        if (entity.getRequestedBy() != null) {
-            response.setRequestedById(entity.getRequestedBy().getId());
-            response.setRequestedByName(entity.getRequestedBy().getName());
-        }
-
-        if (entity.getProject() != null) {
-            response.setProjectId(entity.getProject().getId());
-            response.setProjectName(entity.getProject().getName());
-        }
-
-        if (entity.getProjectTask() != null) {
-            response.setProjectTaskId(entity.getProjectTask().getId());
-            response.setProjectTaskName(entity.getProjectTask().getName());
-        }
-
-        List<RequisitionLineResponse> lineResponses = entity.getLines().stream()
-                .map(this::mapLineToResponse)
-                .collect(Collectors.toList());
-        response.setLines(lineResponses);
-
-        return response;
-    }
-
-    private RequisitionLineResponse mapLineToResponse(RequisitionLineEntity entity) {
-        RequisitionLineResponse response = new RequisitionLineResponse();
-        response.setId(entity.getId());
-        response.setLineNumber(entity.getLineNumber());
-        response.setContent(entity.getContent());
-        response.setQuantityTotal(entity.getQuantityTotal());
-        response.setQuantityToPurchase(entity.getQuantityToPurchase());
-        response.setQuantityToTransfer(entity.getQuantityToTransfer());
-        response.setUom(entity.getUom());
-        response.setStockBalance(entity.getStockBalance());
-        response.setRemainingBudgetQty(entity.getRemainingBudgetQty());
-        response.setTransactionContent(entity.getTransactionContent());
-        response.setFulfillmentSourceId(entity.getFulfillmentSourceId());
-        response.setPrice(entity.getPrice());
-        response.setPricesIncludeVat(entity.getPricesIncludeVat());
-        response.setVatPercentage(entity.getVatPercentage());
-        response.setAmountExclVat(entity.getAmountExclVat());
-        response.setVatAmount(entity.getVatAmount());
-        response.setTotalAmount(entity.getTotalAmount());
-
-        if (entity.getFulfillmentMethod() != null) {
-            response.setFulfillmentMethod(entity.getFulfillmentMethod().name());
-        }
-
-        if (entity.getItem() != null) {
-            response.setItemId(entity.getItem().getId());
-            response.setItemName(entity.getItem().getName());
-        }
-
-        if (entity.getService() != null) {
-            response.setServiceId(entity.getService().getId());
-            response.setServiceName(entity.getService().getName());
-        }
-
-        if (entity.getExpenseItem() != null) {
-            response.setExpenseItemId(entity.getExpenseItem().getId());
-            response.setExpenseItemName(entity.getExpenseItem().getName());
-        }
-
-        if (entity.getProjectTask() != null) {
-            response.setProjectTaskId(entity.getProjectTask().getId());
-            response.setProjectTaskName(entity.getProjectTask().getName());
-        }
-
-        return response;
     }
 }

@@ -14,10 +14,13 @@ public class GateKeeperService {
 
     private final GateKeeperRepository repo;
     private final WarehouseRepository warehouseRepo;
+    private final com.example.multi_tanent.warehouse.mapper.GateKeeperMapper mapper;
 
-    public GateKeeperService(GateKeeperRepository repo, WarehouseRepository warehouseRepo) {
+    public GateKeeperService(GateKeeperRepository repo, WarehouseRepository warehouseRepo,
+            com.example.multi_tanent.warehouse.mapper.GateKeeperMapper mapper) {
         this.repo = repo;
         this.warehouseRepo = warehouseRepo;
+        this.mapper = mapper;
     }
 
     public GateKeeperResponse create(GateKeeperRequest req) {
@@ -25,36 +28,22 @@ public class GateKeeperService {
         WarehouseEntity wh = warehouseRepo.findById(req.getWarehouseId())
                 .orElseThrow(() -> new RuntimeException("Warehouse not found"));
 
-        GateKeeperEntity entity = new GateKeeperEntity();
-        entity.setName(req.getName());
-        entity.setEmployeeCode(req.getEmployeeCode());
-        entity.setPhone(req.getPhone());
+        GateKeeperEntity entity = mapper.toEntity(req);
         entity.setWarehouse(wh);
 
         GateKeeperEntity saved = repo.save(entity);
 
-        return toResponse(saved);
+        return mapper.toResponse(saved);
     }
 
     public List<GateKeeperResponse> list(Long warehouseId) {
         return repo.findByWarehouseId(warehouseId)
                 .stream()
-                .map(this::toResponse)
+                .map(mapper::toResponse)
                 .toList();
     }
 
     public List<GateKeeperResponse> getAll() {
-        return repo.findAll().stream().map(this::toResponse).toList();
-    }
-
-    private GateKeeperResponse toResponse(GateKeeperEntity e) {
-        GateKeeperResponse r = new GateKeeperResponse();
-        r.setId(e.getId());
-        r.setName(e.getName());
-        r.setEmployeeCode(e.getEmployeeCode());
-        r.setPhone(e.getPhone());
-        r.setWarehouseId(e.getWarehouse().getId());
-        r.setWarehouseName(e.getWarehouse().getName());
-        return r;
+        return repo.findAll().stream().map(mapper::toResponse).toList();
     }
 }

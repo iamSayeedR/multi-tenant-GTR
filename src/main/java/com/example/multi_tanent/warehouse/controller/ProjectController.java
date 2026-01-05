@@ -1,9 +1,9 @@
 package com.example.multi_tanent.warehouse.controller;
 
-import com.example.multi_tanent.warehouse.entity.ProjectEntity;
 import com.example.multi_tanent.warehouse.entity.ProjectTaskEntity;
-import com.example.multi_tanent.warehouse.repository.ProjectRepository;
-import com.example.multi_tanent.warehouse.repository.ProjectTaskRepository;
+import com.example.multi_tanent.warehouse.model.ProjectRequest;
+import com.example.multi_tanent.warehouse.model.ProjectResponse;
+import com.example.multi_tanent.warehouse.service.ProjectService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,34 +17,31 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Project Management", description = "Manage projects and project tasks for cost tracking")
 public class ProjectController {
 
-    private final ProjectRepository projectRepository;
-    private final ProjectTaskRepository projectTaskRepository;
+    private final ProjectService projectService;
 
-    public ProjectController(ProjectRepository projectRepository, ProjectTaskRepository projectTaskRepository) {
-        this.projectRepository = projectRepository;
-        this.projectTaskRepository = projectTaskRepository;
+    public ProjectController(ProjectService projectService) {
+        this.projectService = projectService;
     }
 
     @PostMapping
     @Operation(summary = "Create project", description = "Create a new project for cost tracking")
-    public ResponseEntity<ProjectEntity> create(@RequestBody ProjectEntity project) {
-        ProjectEntity saved = projectRepository.save(project);
-        return ResponseEntity.ok(saved);
+    public ResponseEntity<ProjectResponse> create(@RequestBody ProjectRequest request) {
+        ProjectResponse response = projectService.create(request);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping
     @Operation(summary = "List all projects", description = "Get all active projects")
-    public ResponseEntity<List<ProjectEntity>> listAll() {
-        List<ProjectEntity> projects = projectRepository.findByActiveTrue();
+    public ResponseEntity<List<ProjectResponse>> listAll() {
+        List<ProjectResponse> projects = projectService.listAll();
         return ResponseEntity.ok(projects);
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Get project by ID", description = "Retrieve a specific project")
-    public ResponseEntity<ProjectEntity> getById(
+    public ResponseEntity<ProjectResponse> getById(
             @Parameter(description = "Project ID") @PathVariable Long id) {
-        ProjectEntity project = projectRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+        ProjectResponse project = projectService.getById(id);
         return ResponseEntity.ok(project);
     }
 
@@ -52,7 +49,7 @@ public class ProjectController {
     @Operation(summary = "Get project tasks", description = "Get all tasks for a specific project")
     public ResponseEntity<List<ProjectTaskEntity>> getProjectTasks(
             @Parameter(description = "Project ID") @PathVariable Long id) {
-        List<ProjectTaskEntity> tasks = projectTaskRepository.findByProjectId(id);
+        List<ProjectTaskEntity> tasks = projectService.getProjectTasks(id);
         return ResponseEntity.ok(tasks);
     }
 
@@ -61,10 +58,7 @@ public class ProjectController {
     public ResponseEntity<ProjectTaskEntity> createTask(
             @Parameter(description = "Project ID") @PathVariable Long id,
             @RequestBody ProjectTaskEntity task) {
-        ProjectEntity project = projectRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Project not found"));
-        task.setProject(project);
-        ProjectTaskEntity saved = projectTaskRepository.save(task);
+        ProjectTaskEntity saved = projectService.createProjectTask(id, task);
         return ResponseEntity.ok(saved);
     }
 }

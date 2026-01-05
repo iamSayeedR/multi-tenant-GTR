@@ -15,27 +15,25 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ItemService {
 
-
     public final ItemRepository itemRepository;
 
     public final LocationRepository locationRepository;
 
-    public  final InventoryRepository inventoryRepository;
+    public final InventoryRepository inventoryRepository;
 
-    public ItemService(ItemRepository itemRepository, LocationRepository locationRepository, InventoryRepository inventoryRepository) {
+    private final com.example.multi_tanent.warehouse.mapper.ItemMapper itemMapper;
+
+    public ItemService(ItemRepository itemRepository, LocationRepository locationRepository,
+            InventoryRepository inventoryRepository, com.example.multi_tanent.warehouse.mapper.ItemMapper itemMapper) {
         this.itemRepository = itemRepository;
         this.locationRepository = locationRepository;
         this.inventoryRepository = inventoryRepository;
+        this.itemMapper = itemMapper;
     }
 
     public void uploadItem(Item item) {
 
-        ItemEntity itemEntity = new ItemEntity();
-        itemEntity.setCode(item.getCode());
-        itemEntity.setName(item.getName());
-        itemEntity.setDefaultRate(item.getDefaultRate());
-        itemEntity.setDefaultVatPercent(item.getDefaultVatPercent());
-
+        ItemEntity itemEntity = itemMapper.toEntity(item);
         ItemEntity savedItem = itemRepository.save(itemEntity);
 
         // Create inventory rows for all existing locations
@@ -53,17 +51,7 @@ public class ItemService {
     public List<Item> findAll() {
         List<ItemEntity> entities = itemRepository.findAll();
         return entities.stream()
-                .map(this::toDto)
+                .map(itemMapper::toDto)
                 .collect(Collectors.toList());
-    }
-
-    private Item toDto(ItemEntity entity) {
-        Item dto = new Item();
-        dto.setId(entity.getId());
-        dto.setCode(entity.getCode());
-        dto.setName(entity.getName());
-        dto.setDefaultRate(entity.getDefaultRate());
-        dto.setDefaultVatPercent(entity.getDefaultVatPercent());
-        return dto;
     }
 }

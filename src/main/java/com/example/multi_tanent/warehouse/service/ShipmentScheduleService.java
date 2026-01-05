@@ -14,14 +14,17 @@ public class ShipmentScheduleService {
     private final ShipmentScheduleRepository shipmentScheduleRepository;
     private final WarehouseRepository warehouseRepository;
     private final ItemRepository itemRepository;
+    private final com.example.multi_tanent.warehouse.mapper.ShipmentScheduleMapper mapper;
 
     public ShipmentScheduleService(
             ShipmentScheduleRepository shipmentScheduleRepository,
             WarehouseRepository warehouseRepository,
-            ItemRepository itemRepository) {
+            ItemRepository itemRepository,
+            com.example.multi_tanent.warehouse.mapper.ShipmentScheduleMapper mapper) {
         this.shipmentScheduleRepository = shipmentScheduleRepository;
         this.warehouseRepository = warehouseRepository;
         this.itemRepository = itemRepository;
+        this.mapper = mapper;
     }
 
     @Transactional
@@ -57,7 +60,7 @@ public class ShipmentScheduleService {
         }
 
         schedule = shipmentScheduleRepository.save(schedule);
-        return mapToResponse(schedule);
+        return mapper.toResponse(schedule);
     }
 
     @Transactional(readOnly = true)
@@ -71,7 +74,7 @@ public class ShipmentScheduleService {
         }
 
         return schedules.stream()
-                .map(this::mapToResponse)
+                .map(mapper::toResponse)
                 .collect(Collectors.toList());
     }
 
@@ -79,7 +82,7 @@ public class ShipmentScheduleService {
     public ShipmentScheduleResponse getScheduleById(Long id) {
         ShipmentScheduleEntity schedule = shipmentScheduleRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Schedule not found"));
-        return mapToResponse(schedule);
+        return mapper.toResponse(schedule);
     }
 
     @Transactional
@@ -92,38 +95,11 @@ public class ShipmentScheduleService {
         schedule.setStatus("ARRIVED");
         schedule = shipmentScheduleRepository.save(schedule);
 
-        return mapToResponse(schedule);
+        return mapper.toResponse(schedule);
     }
 
     private String generateScheduleNo() {
         long count = shipmentScheduleRepository.count();
         return "SCH-" + String.format("%06d", count + 1);
-    }
-
-    private ShipmentScheduleResponse mapToResponse(ShipmentScheduleEntity entity) {
-        return ShipmentScheduleResponse.builder()
-                .id(entity.getId())
-                .scheduleNo(entity.getScheduleNo())
-                .expectedArrivalDate(entity.getExpectedArrivalDate())
-                .driverName(entity.getDriverName())
-                .truckNumber(entity.getTruckNumber())
-                .supplierName(entity.getSupplierName())
-                .warehouseId(entity.getWarehouse().getId())
-                .warehouseName(entity.getWarehouse().getName())
-                .status(entity.getStatus())
-                .remarks(entity.getRemarks())
-                .createdAt(entity.getCreatedAt())
-                .gateInId(entity.getGateIn() != null ? entity.getGateIn().getId() : null)
-                .gateInNo(entity.getGateIn() != null ? entity.getGateIn().getGateInNo() : null)
-                .lines(entity.getLines().stream()
-                        .map(line -> ShipmentScheduleResponse.ShipmentScheduleLineResponse.builder()
-                                .id(line.getId())
-                                .itemId(line.getItem().getId())
-                                .itemName(line.getItem().getName())
-                                .itemCode(line.getItem().getCode())
-                                .expectedQuantity(line.getExpectedQuantity())
-                                .build())
-                        .collect(Collectors.toList()))
-                .build();
     }
 }

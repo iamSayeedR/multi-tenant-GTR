@@ -21,67 +21,69 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = {"employee", "tenant", "store"})
-@EqualsAndHashCode(exclude = {"employee", "tenant", "store", "location"})
+@ToString(exclude = { "tenant", "store" })
+@EqualsAndHashCode(exclude = { "tenant", "store", "location" })
 public class User {
-  @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "tenant_id") // Temporarily nullable for migration
-    @JsonIgnore
-    private Tenant tenant;
+  @ManyToOne(optional = false)
+  @JoinColumn(name = "tenant_id") // Temporarily nullable for migration
+  @JsonIgnore
+  private Tenant tenant;
 
-    @ManyToOne
-    @JoinColumn(name = "location_id")
-    private Location location;
+  @ManyToOne
+  @JoinColumn(name = "location_id")
+  private Location location;
 
-    @ManyToOne
-    @JoinColumn(name = "store_id")
-    private Store store;
+  @ManyToOne
+  @JoinColumn(name = "store_id")
+  private Store store;
 
-    @Column(nullable=false)
-    private String name;
+  @Column(nullable = false)
+  private String name;
 
-    @Column(nullable=false, unique=true)
-    private String email;
+  @Column(nullable = false, unique = true)
+  private String email;
 
-    @Column(nullable=false)
-    @JsonIgnore
-    private String passwordHash;
+  @Column(nullable = false)
+  @JsonIgnore
+  private String passwordHash;
 
-    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
-    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
-    @Enumerated(EnumType.STRING)
-    @Column(name = "role", nullable = false)
-    private Set<Role> roles;
+  @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
+  @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+  @Enumerated(EnumType.STRING)
+  @Column(name = "role", nullable = false)
+  private Set<Role> roles;
 
-    private Boolean isActive;
-    private Boolean isLocked;
-    private Integer loginAttempts;
-    private LocalDateTime lastLoginAt;
-    private String lastLoginIp;
+  private Boolean isActive;
+  private Boolean isLocked;
+  private Integer loginAttempts;
+  private LocalDateTime lastLoginAt;
+  private String lastLoginIp;
 
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+  private LocalDateTime createdAt;
+  private LocalDateTime updatedAt;
 
-    @OneToOne(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
-    @JsonManagedReference("user-employee")
-    private Employee employee;
+  // @OneToOne(mappedBy = "user", cascade = {CascadeType.PERSIST,
+  // CascadeType.MERGE, CascadeType.REFRESH})
+  // @JsonManagedReference("user-employee")
+  // private Employee employee;
 
-    // Helper methods for bidirectional relationship
-    public void setEmployee(Employee employee) {
-        if (employee == null) {
-            if (this.employee != null) {
-                this.employee.setUser(null);
-            }
-        } else {
-            employee.setUser(this);
-        }
-        this.employee = employee;
-    }
+  // // Helper methods for bidirectional relationship
+  // public void setEmployee(Employee employee) {
+  // if (employee == null) {
+  // if (this.employee != null) {
+  // this.employee.setUser(null);
+  // }
+  // } else {
+  // employee.setUser(this);
+  // }
+  // this.employee = employee;
+  // }
 
-    public void removeEmployee() {
-        setEmployee(null);
-    }
+  // public void removeEmployee() {
+  // setEmployee(null);
+  // }
 }

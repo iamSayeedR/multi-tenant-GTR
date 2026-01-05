@@ -1,9 +1,10 @@
 package com.example.multi_tanent.pos.service;
 
 import com.example.multi_tanent.pos.dto.UpdateTenantRequest;
-import com.example.multi_tanent.pos.dto.TenantDto;
-import com.example.multi_tanent.pos.repository.TenantRepository;
+import com.example.multi_tanent.spersusers.dto.TenantDto;
 import com.example.multi_tanent.spersusers.enitity.Tenant;
+import com.example.multi_tanent.spersusers.repository.TenantRepository;
+
 import org.springframework.core.io.Resource;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;

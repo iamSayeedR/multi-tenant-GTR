@@ -1,6 +1,6 @@
 master:
     datasource:
-        url: jdbc:mysql://localhost:3306/master_db
+        url: jdbc:mysql://localhost:3306/master_db_pos
         username: root
         password : Sajid7254@
 

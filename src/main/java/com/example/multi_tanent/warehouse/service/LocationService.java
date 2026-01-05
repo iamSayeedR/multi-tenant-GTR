@@ -22,11 +22,15 @@ public class LocationService {
 
     private final InventoryRepository inventoryRepository;
 
+    private final com.example.multi_tanent.warehouse.mapper.LocationMapper locationMapper;
+
     public LocationService(LocationRepository locationRepository, ItemRepository itemRepository,
-            InventoryRepository inventoryRepository) {
+            InventoryRepository inventoryRepository,
+            com.example.multi_tanent.warehouse.mapper.LocationMapper locationMapper) {
         this.locationRepository = locationRepository;
         this.itemRepository = itemRepository;
         this.inventoryRepository = inventoryRepository;
+        this.locationMapper = locationMapper;
     }
 
     public void uploadLocation(Location location) {
@@ -68,40 +72,28 @@ public class LocationService {
     public List<Location> findAll() {
         List<LocationEntity> entities = locationRepository.findAll();
         return entities.stream()
-                .map(this::toDto)
+                .map(locationMapper::toDto)
                 .toList();
-    }
-
-    private Location toDto(LocationEntity entity) {
-        Location dto = new Location();
-        dto.setId(entity.getId());
-        dto.setName(entity.getName());
-        dto.setType(entity.getLocationType());
-        dto.setParentId(entity.getParentLocationId());
-        dto.setWarehouseId(entity.getWarehouseId());
-        dto.setCode(entity.getCode());
-        dto.setDescription(entity.getDescription());
-        return dto;
     }
 
     public List<Location> getChildren(Long parentId) {
         return locationRepository.findByParentLocationId(parentId)
                 .stream()
-                .map(this::toDto)
+                .map(locationMapper::toDto)
                 .toList();
     }
 
     public List<Location> getByWarehouse(Long warehouseId) {
         return locationRepository.findByWarehouseId(warehouseId)
                 .stream()
-                .map(this::toDto)
+                .map(locationMapper::toDto)
                 .toList();
     }
 
     public List<Location> getByType(String type) {
         return locationRepository.findByLocationType(type)
                 .stream()
-                .map(this::toDto)
+                .map(locationMapper::toDto)
                 .toList();
     }
 

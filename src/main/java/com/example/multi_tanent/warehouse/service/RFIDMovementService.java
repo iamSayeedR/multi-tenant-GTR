@@ -19,16 +19,19 @@ public class RFIDMovementService {
     private final RFIDTagRepository tagRepo;
     private final InventoryRepository inventoryRepo;
     private final LocationRepository locationRepo;
+    private final com.example.multi_tanent.warehouse.mapper.RFIDMovementMapper mapper;
 
     public RFIDMovementService(
             RFIDMovementRepository repo,
             RFIDTagRepository tagRepo,
             InventoryRepository inventoryRepo,
-            LocationRepository locationRepo) {
+            LocationRepository locationRepo,
+            com.example.multi_tanent.warehouse.mapper.RFIDMovementMapper mapper) {
         this.repo = repo;
         this.tagRepo = tagRepo;
         this.inventoryRepo = inventoryRepo;
         this.locationRepo = locationRepo;
+        this.mapper = mapper;
     }
 
     /**
@@ -107,7 +110,9 @@ public class RFIDMovementService {
         inventoryRepo.save(newInv);
     }
 
-    public List<RFIDMovementLogEntity> getLogs() {
-        return repo.findAll();
+    public List<com.example.multi_tanent.warehouse.model.RFIDMovementResponse> getLogs() {
+        return repo.findAll().stream()
+                .map(mapper::toResponse)
+                .collect(java.util.stream.Collectors.toList());
     }
 }

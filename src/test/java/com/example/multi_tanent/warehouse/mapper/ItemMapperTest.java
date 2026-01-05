@@ -1,16 +1,15 @@
 package com.example.multi_tanent.warehouse.mapper;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.example.multi_tanent.warehouse.entity.ItemEntity;
 import com.example.multi_tanent.warehouse.model.Item;
+import java.math.BigDecimal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.math.BigDecimal;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class ItemMapperTest {

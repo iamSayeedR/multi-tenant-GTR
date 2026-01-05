@@ -1,5 +1,10 @@
 package com.example.multi_tanent.warehouse.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 import com.example.multi_tanent.warehouse.entity.DepartmentEntity;
 import com.example.multi_tanent.warehouse.entity.WarehouseEntity;
 import com.example.multi_tanent.warehouse.mapper.DepartmentMapper;
@@ -7,21 +12,16 @@ import com.example.multi_tanent.warehouse.model.DepartmentRequest;
 import com.example.multi_tanent.warehouse.model.DepartmentResponse;
 import com.example.multi_tanent.warehouse.repository.DepartmentRepository;
 import com.example.multi_tanent.warehouse.repository.WarehouseRepository;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class DepartmentServiceTest {
@@ -76,7 +76,7 @@ class DepartmentServiceTest {
     }
 
     @Test
-    void create_ShouldCreateDepartmentSuccessfully() {
+    void ShouldCreateDepartmentSuccessfully() {
         // Given
         when(departmentMapper.toEntity(departmentRequest)).thenReturn(departmentEntity);
         when(warehouseRepository.findById(1L)).thenReturn(Optional.of(warehouseEntity));
@@ -99,7 +99,7 @@ class DepartmentServiceTest {
     }
 
     @Test
-    void create_WithoutWarehouse_ShouldCreateSuccessfully() {
+    void ShouldCreateWithoutWarehouseSuccessfully() {
         // Given
         DepartmentRequest requestWithoutWarehouse = DepartmentRequest.builder()
                 .name("IT Department")
@@ -121,7 +121,7 @@ class DepartmentServiceTest {
     }
 
     @Test
-    void create_WithInvalidWarehouseId_ShouldThrowException() {
+    void ShouldThrowExceptionWhenWarehouseIdIsInvalid() {
         // Given
         when(departmentMapper.toEntity(departmentRequest)).thenReturn(departmentEntity);
         when(warehouseRepository.findById(1L)).thenReturn(Optional.empty());
@@ -135,9 +135,9 @@ class DepartmentServiceTest {
     }
 
     @Test
-    void listAll_ShouldReturnAllActiveDepartments() {
+    void ShouldReturnAllActiveDepartments() {
         // Given
-        List<DepartmentEntity> departments = Arrays.asList(departmentEntity);
+        List<DepartmentEntity> departments = Collections.singletonList(departmentEntity);
         when(departmentRepository.findByActiveTrue()).thenReturn(departments);
         when(departmentMapper.toResponse(departmentEntity)).thenReturn(departmentResponse);
 
@@ -146,16 +146,16 @@ class DepartmentServiceTest {
 
         // Then
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).getName()).isEqualTo("IT Department");
+        assertThat(result.getFirst().getName()).isEqualTo("IT Department");
 
         verify(departmentRepository).findByActiveTrue();
         verify(departmentMapper).toResponse(departmentEntity);
     }
 
     @Test
-    void listAll_WithNoDepartments_ShouldReturnEmptyList() {
+    void ShouldReturnEmptyListWithNoDepartment() {
         // Given
-        when(departmentRepository.findByActiveTrue()).thenReturn(Arrays.asList());
+        when(departmentRepository.findByActiveTrue()).thenReturn(List.of());
 
         // When
         List<DepartmentResponse> result = departmentService.listAll();
@@ -166,7 +166,7 @@ class DepartmentServiceTest {
     }
 
     @Test
-    void getById_ShouldReturnDepartment() {
+    void ShouldReturnDepartmentById() {
         // Given
         when(departmentRepository.findById(1L)).thenReturn(Optional.of(departmentEntity));
         when(departmentMapper.toResponse(departmentEntity)).thenReturn(departmentResponse);

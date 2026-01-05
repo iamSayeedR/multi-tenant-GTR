@@ -29,7 +29,7 @@ public class RFIDMovementController {
 
     @GetMapping
     @Operation(summary = "Get movement logs", description = "Get all RFID movement history")
-    public List<RFIDMovementLogEntity> getAll() {
+    public List<com.example.multi_tanent.warehouse.model.RFIDMovementResponse> getAll() {
         return service.getLogs();
     }
 }

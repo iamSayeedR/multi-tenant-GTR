@@ -3,6 +3,8 @@ package com.example.multi_tanent.spersusers.controller;
 import com.example.multi_tanent.config.TenantContext;
 import com.example.multi_tanent.master.entity.MasterTenant;
 import com.example.multi_tanent.spersusers.dto.UserRegisterRequest;
+import com.example.multi_tanent.spersusers.dto.UserResponse;
+import com.example.multi_tanent.spersusers.dto.UserUpdateRequest;
 import com.example.multi_tanent.spersusers.enitity.Location;
 import com.example.multi_tanent.spersusers.enitity.Store;
 import com.example.multi_tanent.spersusers.enitity.Tenant;
@@ -10,8 +12,6 @@ import com.example.multi_tanent.spersusers.enitity.User;
 import com.example.multi_tanent.spersusers.repository.UserRepository;
 import com.example.multi_tanent.spersusers.repository.LocationRepository;
 import com.example.multi_tanent.master.repository.MasterTenantRepository;
-import com.example.multi_tanent.tenant.base.dto.UserResponse;
-import com.example.multi_tanent.tenant.base.dto.UserUpdateRequest;
 
 import jakarta.validation.Valid;
 

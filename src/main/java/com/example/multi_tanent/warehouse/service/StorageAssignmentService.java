@@ -18,6 +18,7 @@ public class StorageAssignmentService {
     private final LocationRepository locationRepository;
     private final LocationService locationService;
     private final InventoryService inventoryService;
+    private final com.example.multi_tanent.warehouse.mapper.StorageAssignmentMapper mapper;
 
     public StorageAssignmentService(
             StorageAssignmentRepository storageAssignmentRepository,
@@ -25,13 +26,15 @@ public class StorageAssignmentService {
             StoreKeeperRepository storeKeeperRepository,
             LocationRepository locationRepository,
             LocationService locationService,
-            InventoryService inventoryService) {
+            InventoryService inventoryService,
+            com.example.multi_tanent.warehouse.mapper.StorageAssignmentMapper mapper) {
         this.storageAssignmentRepository = storageAssignmentRepository;
         this.gateInLineRepository = gateInLineRepository;
         this.storeKeeperRepository = storeKeeperRepository;
         this.locationRepository = locationRepository;
         this.locationService = locationService;
         this.inventoryService = inventoryService;
+        this.mapper = mapper;
     }
 
     @Transactional
@@ -81,7 +84,7 @@ public class StorageAssignmentService {
         storeKeeperRepository.save(storeKeeper);
 
         assignment = storageAssignmentRepository.save(assignment);
-        return mapToResponse(assignment);
+        return mapper.toResponse(assignment);
     }
 
     @Transactional
@@ -113,7 +116,7 @@ public class StorageAssignmentService {
         storeKeeperRepository.save(storeKeeper);
 
         assignment = storageAssignmentRepository.save(assignment);
-        return mapToResponse(assignment);
+        return mapper.toResponse(assignment);
     }
 
     @Transactional(readOnly = true)
@@ -129,7 +132,7 @@ public class StorageAssignmentService {
         }
 
         return assignments.stream()
-                .map(this::mapToResponse)
+                .map(mapper::toResponse)
                 .collect(Collectors.toList());
     }
 
@@ -137,7 +140,7 @@ public class StorageAssignmentService {
     public StorageAssignmentResponse getAssignmentById(Long id) {
         StorageAssignmentEntity assignment = storageAssignmentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Assignment not found"));
-        return mapToResponse(assignment);
+        return mapper.toResponse(assignment);
     }
 
     @Transactional(readOnly = true)
@@ -150,41 +153,6 @@ public class StorageAssignmentService {
     private String generateAssignmentNo() {
         long count = storageAssignmentRepository.count();
         return "ASG-" + String.format("%06d", count + 1);
-    }
-
-    private StorageAssignmentResponse mapToResponse(StorageAssignmentEntity entity) {
-        // Get location hierarchy
-        LocationEntity bin = entity.getTargetLocation();
-        LocationEntity rack = bin.getParentLocationId() != null
-                ? locationRepository.findById(bin.getParentLocationId()).orElse(null)
-                : null;
-        LocationEntity floor = rack != null && rack.getParentLocationId() != null
-                ? locationRepository.findById(rack.getParentLocationId()).orElse(null)
-                : null;
-        LocationEntity zone = floor != null && floor.getParentLocationId() != null
-                ? locationRepository.findById(floor.getParentLocationId()).orElse(null)
-                : null;
-
-        return StorageAssignmentResponse.builder()
-                .id(entity.getId())
-                .assignmentNo(entity.getAssignmentNo())
-                .gateInLineId(entity.getGateInLine().getId())
-                .itemId(entity.getGateInLine().getItem().getId())
-                .itemName(entity.getGateInLine().getItem().getName())
-                .assignedToId(entity.getAssignedTo().getId())
-                .assignedToName(entity.getAssignedTo().getName())
-                .assignedToCode(entity.getAssignedTo().getEmployeeCode())
-                .targetLocationId(entity.getTargetLocation().getId())
-                .binName(bin.getName())
-                .rackName(rack != null ? rack.getName() : null)
-                .floorName(floor != null ? floor.getName() : null)
-                .zoneName(zone != null ? zone.getName() : null)
-                .quantityToStore(entity.getQuantityToStore())
-                .status(entity.getStatus())
-                .assignedAt(entity.getAssignedAt())
-                .completedAt(entity.getCompletedAt())
-                .completionRemarks(entity.getCompletionRemarks())
-                .build();
     }
 
     /**

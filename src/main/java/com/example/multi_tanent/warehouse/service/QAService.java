@@ -19,14 +19,17 @@ public class QAService {
     private final QARecordRepository qaRecordRepository;
     private final GateInRepository gateInRepository;
     private final StoreKeeperRepository storeKeeperRepository;
+    private final com.example.multi_tanent.warehouse.mapper.QAMapper mapper;
 
     public QAService(
             QARecordRepository qaRecordRepository,
             GateInRepository gateInRepository,
-            StoreKeeperRepository storeKeeperRepository) {
+            StoreKeeperRepository storeKeeperRepository,
+            com.example.multi_tanent.warehouse.mapper.QAMapper mapper) {
         this.qaRecordRepository = qaRecordRepository;
         this.gateInRepository = gateInRepository;
         this.storeKeeperRepository = storeKeeperRepository;
+        this.mapper = mapper;
     }
 
     @Transactional
@@ -61,34 +64,20 @@ public class QAService {
         qaRecord.setInspectedBy(storeKeeper);
 
         qaRecord = qaRecordRepository.save(qaRecord);
-        return mapToResponse(qaRecord);
+        return mapper.toResponse(qaRecord);
     }
 
     @Transactional(readOnly = true)
     public QAResponse getQAByGateInId(Long gateInId) {
         QARecordEntity qaRecord = qaRecordRepository.findByGateInId(gateInId)
                 .orElseThrow(() -> new IllegalArgumentException("QA record not found for this Gate In"));
-        return mapToResponse(qaRecord);
+        return mapper.toResponse(qaRecord);
     }
 
     @Transactional(readOnly = true)
     public List<QAResponse> getAllQARecords() {
         return qaRecordRepository.findAll().stream()
-                .map(this::mapToResponse)
+                .map(mapper::toResponse)
                 .collect(Collectors.toList());
-    }
-
-    private QAResponse mapToResponse(QARecordEntity entity) {
-        return QAResponse.builder()
-                .id(entity.getId())
-                .gateInId(entity.getGateIn().getId())
-                .gateInNo(entity.getGateIn().getGateInNo())
-                .driverRating(entity.getDriverRating())
-                .itemQualityRating(entity.getItemQualityRating())
-                .qaRemarks(entity.getQaRemarks())
-                .inspectedById(entity.getInspectedBy().getId())
-                .inspectedByName(entity.getInspectedBy().getName())
-                .inspectionDate(entity.getInspectionDate())
-                .build();
     }
 }
