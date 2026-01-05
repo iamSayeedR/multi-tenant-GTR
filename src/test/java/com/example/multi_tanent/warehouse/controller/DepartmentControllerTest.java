@@ -98,7 +98,8 @@ class DepartmentControllerTest {
     }
 
     @Test
-    void ShouldReturnDepartmentById() throws Exception {
+    @SneakyThrows
+    void ShouldReturnDepartmentById() {
         // Given
         when(departmentService.getById(1L)).thenReturn(departmentResponse);
 
@@ -111,7 +112,8 @@ class DepartmentControllerTest {
     }
 
     @Test
-    void getById_WithInvalidId_ShouldReturnNotFound() throws Exception {
+    @SneakyThrows
+    void ShouldReturnNotFoundWhenIdIsInvalid() {
         // Given
         when(departmentService.getById(999L)).thenThrow(new RuntimeException("Department not found"));
 
