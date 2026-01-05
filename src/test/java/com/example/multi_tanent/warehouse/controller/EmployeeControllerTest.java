@@ -12,7 +12,10 @@ import com.example.multi_tanent.warehouse.model.EmployeeResponse;
 import com.example.multi_tanent.warehouse.service.EmployeeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +63,8 @@ class EmployeeControllerTest {
     }
 
     @Test
-    void create_ShouldReturnCreatedEmployee() throws Exception {
+    @SneakyThrows
+    void ShouldReturn200WhenEmployeeIsCreated() {
         // Given
         when(employeeService.create(any(EmployeeRequest.class))).thenReturn(employeeResponse);
 
@@ -80,9 +84,10 @@ class EmployeeControllerTest {
     }
 
     @Test
-    void listAll_ShouldReturnAllEmployees() throws Exception {
+    @SneakyThrows
+    void ShouldReturnAllEmployees() {
         // Given
-        List<EmployeeResponse> employees = Arrays.asList(employeeResponse);
+        List<EmployeeResponse> employees = Collections.singletonList(employeeResponse);
         when(employeeService.listAll()).thenReturn(employees);
 
         // When/Then
@@ -95,7 +100,8 @@ class EmployeeControllerTest {
     }
 
     @Test
-    void getById_ShouldReturnEmployee() throws Exception {
+    @SneakyThrows
+    void ShouldReturnEmployeeById() {
         // Given
         when(employeeService.getById(1L)).thenReturn(employeeResponse);
 
@@ -108,7 +114,8 @@ class EmployeeControllerTest {
     }
 
     @Test
-    void getById_WithInvalidId_ShouldReturnError() throws Exception {
+    @SneakyThrows
+    void ShouldReturnErrorWhenIdIsInValid() {
         // Given
         when(employeeService.getById(999L)).thenThrow(new RuntimeException("Employee not found"));
 

@@ -13,6 +13,8 @@ import com.example.multi_tanent.warehouse.service.WarehouseService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
 import java.util.List;
+
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +61,8 @@ class WarehouseControllerTest {
         }
 
         @Test
-        void create_ShouldReturnWarehouseResponse() throws Exception {
+        @SneakyThrows
+        void shouldCreateAndReturnWarehouseResponse() {
                 // Given
                 when(warehouseService.create(any(WarehouseRequest.class))).thenReturn(warehouseResponse);
 
@@ -78,7 +81,8 @@ class WarehouseControllerTest {
         }
 
         @Test
-        void getAll_ShouldReturnWarehouseList() throws Exception {
+        @SneakyThrows
+        void shouldReturnWarehouseList() {
                 // Given
                 WarehouseResponse warehouse2 = WarehouseResponse.builder()
                                 .id(2L)
@@ -107,9 +111,10 @@ class WarehouseControllerTest {
         }
 
         @Test
-        void getAll_WhenEmpty_ShouldReturnEmptyList() throws Exception {
+        @SneakyThrows
+        void shouldReturnEmptyList() {
                 // Given
-                when(warehouseService.getAll()).thenReturn(Arrays.asList());
+                when(warehouseService.getAll()).thenReturn(List.of());
 
                 // When/Then
                 mockMvc.perform(get("/api/warehouses"))

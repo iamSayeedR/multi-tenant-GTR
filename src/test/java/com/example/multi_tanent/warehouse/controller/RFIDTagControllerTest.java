@@ -13,6 +13,8 @@ import com.example.multi_tanent.warehouse.service.RFIDTagService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
 import java.util.List;
+
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +57,8 @@ class RFIDTagControllerTest {
         }
 
         @Test
-        void register_ShouldReturnRFIDTagResponse() throws Exception {
+        @SneakyThrows
+        void shouldRegisterAndReturnRFIDTagResponse() {
                 // Given
                 when(rfidTagService.register(any(RFIDTagRequest.class))).thenReturn(rfidTagResponse);
 
@@ -74,7 +77,8 @@ class RFIDTagControllerTest {
         }
 
         @Test
-        void getAll_ShouldReturnRFIDTagList() throws Exception {
+        @SneakyThrows
+        void shouldReturnRFIDTagList() throws Exception {
                 // Given
                 RFIDTagResponse tag2 = RFIDTagResponse.builder()
                                 .id(2L)
@@ -101,9 +105,9 @@ class RFIDTagControllerTest {
         }
 
         @Test
-        void getAll_WhenEmpty_ShouldReturnEmptyList() throws Exception {
+        void shouldReturnEmptyList() throws Exception {
                 // Given
-                when(rfidTagService.getAll()).thenReturn(Arrays.asList());
+                when(rfidTagService.getAll()).thenReturn(List.of());
 
                 // When/Then
                 mockMvc.perform(get("/api/rfid-tags"))

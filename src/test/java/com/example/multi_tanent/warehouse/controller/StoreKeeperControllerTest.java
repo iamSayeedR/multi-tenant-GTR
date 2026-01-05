@@ -1,5 +1,6 @@
 package com.example.multi_tanent.warehouse.controller;
 
+import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
@@ -14,6 +15,8 @@ import com.example.multi_tanent.warehouse.service.StoreKeeperService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
 import java.util.List;
+
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +63,8 @@ class StoreKeeperControllerTest {
         }
 
         @Test
-        void create_ShouldReturnStoreKeeperResponse() throws Exception {
+        @SneakyThrows
+        void shouldCreateAndReturnStoreKeeperResponse() {
                 // Given
                 when(storeKeeperService.create(any(StoreKeeperRequest.class))).thenReturn(storeKeeperResponse);
 
@@ -79,7 +83,8 @@ class StoreKeeperControllerTest {
         }
 
         @Test
-        void getAll_ShouldReturnStoreKeeperList() throws Exception {
+        @SneakyThrows
+        void shouldReturnStoreKeeperList() {
                 // Given
                 StoreKeeperResponse storeKeeper2 = StoreKeeperResponse.builder()
                                 .id(2L)
@@ -106,10 +111,10 @@ class StoreKeeperControllerTest {
         }
 
         @Test
-        void list_ByWarehouse_ShouldReturnWarehouseStoreKeepers() throws Exception {
+        void shouldReturnWarehouseStoreKeepers() throws Exception {
                 // Given
                 Long warehouseId = 1L;
-                List<StoreKeeperResponse> storeKeepers = Arrays.asList(storeKeeperResponse);
+                List<StoreKeeperResponse> storeKeepers = singletonList(storeKeeperResponse);
                 when(storeKeeperService.list(eq(warehouseId))).thenReturn(storeKeepers);
 
                 // When/Then
@@ -123,10 +128,11 @@ class StoreKeeperControllerTest {
         }
 
         @Test
-        void list_ByWarehouse_WhenEmpty_ShouldReturnEmptyList() throws Exception {
+        @SneakyThrows
+        void shouldReturnEmptyList() {
                 // Given
                 Long warehouseId = 999L;
-                when(storeKeeperService.list(eq(warehouseId))).thenReturn(Arrays.asList());
+                when(storeKeeperService.list(eq(warehouseId))).thenReturn(List.of());
 
                 // When/Then
                 mockMvc.perform(get("/api/store-keepers/{warehouseId}", warehouseId))

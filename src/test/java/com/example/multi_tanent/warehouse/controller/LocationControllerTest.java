@@ -1,5 +1,6 @@
 package com.example.multi_tanent.warehouse.controller;
 
+import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
@@ -14,6 +15,8 @@ import com.example.multi_tanent.warehouse.service.LocationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
 import java.util.List;
+
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +55,8 @@ class LocationControllerTest {
         }
 
         @Test
-        void uploadLocation_ShouldReturnSuccess() throws Exception {
+        @SneakyThrows
+        void ShouldReturnSuccessWhenLocationIsUploaded() {
                 // Given
                 doNothing().when(locationService).uploadLocation(any(Location.class));
 
@@ -67,7 +71,8 @@ class LocationControllerTest {
         }
 
         @Test
-        void getAllLocations_ShouldReturnLocationList() throws Exception {
+        @SneakyThrows
+        void ShouldReturnLocationList() {
                 // Given
                 Location location2 = Location.builder()
                                 .id(2L)
@@ -96,7 +101,8 @@ class LocationControllerTest {
         }
 
         @Test
-        void getChildren_ShouldReturnChildLocations() throws Exception {
+        @SneakyThrows
+        void ShouldReturnChildLocations() {
                 // Given
                 Long parentId = 1L;
                 Location child1 = Location.builder()
@@ -131,10 +137,11 @@ class LocationControllerTest {
         }
 
         @Test
-        void getByWarehouse_ShouldReturnWarehouseLocations() throws Exception {
+        @SneakyThrows
+        void getByWarehouse_ShouldReturnWarehouseLocations() {
                 // Given
                 Long warehouseId = 1L;
-                List<Location> locations = Arrays.asList(location);
+                List<Location> locations = singletonList(location);
                 when(locationService.getByWarehouse(eq(warehouseId))).thenReturn(locations);
 
                 // When/Then
@@ -147,7 +154,8 @@ class LocationControllerTest {
         }
 
         @Test
-        void getTree_ShouldReturnLocationTree() throws Exception {
+        @SneakyThrows
+        void ShouldReturnLocationTree() {
                 // Given
                 Long warehouseId = 1L;
                 LocationNode rootNode = LocationNode.builder()
@@ -155,10 +163,10 @@ class LocationControllerTest {
                                 .code("LOC-001")
                                 .name("Warehouse A")
                                 .type("WAREHOUSE")
-                                .children(Arrays.asList())
+                                .children(List.of())
                                 .build();
 
-                List<LocationNode> tree = Arrays.asList(rootNode);
+                List<LocationNode> tree = singletonList(rootNode);
                 when(locationService.getLocationTree(eq(warehouseId))).thenReturn(tree);
 
                 // When/Then

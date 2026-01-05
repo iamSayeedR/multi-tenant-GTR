@@ -16,6 +16,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,7 +72,8 @@ class ProjectControllerTest {
         }
 
         @Test
-        void create_ShouldReturnSavedProject() throws Exception {
+        @SneakyThrows
+        void ShouldReturnSavedProject() {
                 // Given
                 when(projectService.create(any(ProjectRequest.class))).thenReturn(projectResponse);
 
@@ -88,7 +91,8 @@ class ProjectControllerTest {
         }
 
         @Test
-        void listAll_ShouldReturnActiveProjects() throws Exception {
+        @SneakyThrows
+        void ShouldReturnAllActiveProjects() {
                 // Given
                 ProjectResponse project2 = ProjectResponse.builder()
                                 .id(2L)
@@ -113,7 +117,8 @@ class ProjectControllerTest {
         }
 
         @Test
-        void getById_ShouldReturnProject() throws Exception {
+        @SneakyThrows
+        void ShouldReturnProjectById() {
                 // Given
                 when(projectService.getById(eq(1L))).thenReturn(projectResponse);
 
@@ -128,7 +133,8 @@ class ProjectControllerTest {
         }
 
         @Test
-        void getById_WithInvalidId_ShouldReturnError() throws Exception {
+        @SneakyThrows
+        void getById_WithInvalidId_ShouldReturnErrorWhenIdIsInvalid() {
                 // Given
                 when(projectService.getById(eq(999L))).thenThrow(new RuntimeException("Project not found"));
 
@@ -140,7 +146,8 @@ class ProjectControllerTest {
         }
 
         @Test
-        void getProjectTasks_ShouldReturnTaskList() throws Exception {
+        @SneakyThrows
+        void ShouldReturnProjectTaskList() throws Exception {
                 // Given
                 ProjectTaskEntity task2 = new ProjectTaskEntity();
                 task2.setId(2L);
@@ -162,7 +169,8 @@ class ProjectControllerTest {
         }
 
         @Test
-        void createTask_ShouldReturnSavedTask() throws Exception {
+        @SneakyThrows
+        void ShouldReturnSavedTask() {
                 // Given
                 when(projectService.createProjectTask(eq(1L), any(ProjectTaskEntity.class))).thenReturn(task);
 
@@ -178,7 +186,8 @@ class ProjectControllerTest {
         }
 
         @Test
-        void createTask_WithInvalidProjectId_ShouldReturnError() throws Exception {
+        @SneakyThrows
+        void ShouldReturnErrorWhenProjectIdIsInvalid() {
                 // Given
                 when(projectService.createProjectTask(eq(999L), any(ProjectTaskEntity.class)))
                                 .thenThrow(new RuntimeException("Project not found"));

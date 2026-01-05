@@ -13,6 +13,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
+
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +54,8 @@ class ItemControllerTest {
     }
 
     @Test
-    void uploadItem_ShouldReturnSuccess() throws Exception {
+    @SneakyThrows
+    void ShouldReturnSuccessWithItemIsUploaded() {
         // Given
         doNothing().when(itemService).uploadItem(any(Item.class));
 
@@ -67,7 +70,8 @@ class ItemControllerTest {
     }
 
     @Test
-    void getAllItems_ShouldReturnItemList() throws Exception {
+    @SneakyThrows
+    void ShouldReturnItemList() {
         // Given
         Item item2 = Item.builder()
                 .id(2L)
@@ -96,9 +100,10 @@ class ItemControllerTest {
     }
 
     @Test
-    void getAllItems_WhenEmpty_ShouldReturnEmptyList() throws Exception {
+    @SneakyThrows
+    void ShouldReturnEmptyList() {
         // Given
-        when(itemService.findAll()).thenReturn(Arrays.asList());
+        when(itemService.findAll()).thenReturn(List.of());
 
         // When/Then
         mockMvc.perform(get("/api/warehouse-items"))

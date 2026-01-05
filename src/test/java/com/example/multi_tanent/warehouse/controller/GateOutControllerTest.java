@@ -1,5 +1,6 @@
 package com.example.multi_tanent.warehouse.controller;
 
+import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.*;
@@ -16,6 +17,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +64,8 @@ class GateOutControllerTest {
         }
 
         @Test
-        void createGateOut_ShouldReturnGateOutResponse() throws Exception {
+        @SneakyThrows
+        void ShouldReturnGateOutResponseWhenGateOutIsCreated() {
                 // Given
                 when(gateOutService.createGateOut(any(GateOutRequest.class))).thenReturn(gateOutResponse);
 
@@ -79,7 +83,8 @@ class GateOutControllerTest {
         }
 
         @Test
-        void listGateOuts_WithoutFilter_ShouldReturnAllGateOuts() throws Exception {
+        @SneakyThrows
+        void ShouldReturnAllGateOutsWithFilter() {
                 // Given
                 GateOutResponse gateOut2 = GateOutResponse.builder()
                                 .id(2L)
@@ -104,9 +109,10 @@ class GateOutControllerTest {
         }
 
         @Test
-        void listGateOuts_WithStatusFilter_ShouldReturnFilteredGateOuts() throws Exception {
+        @SneakyThrows
+        void ShouldReturnFilteredGateOutsWithStatusFilter() {
                 // Given
-                List<GateOutResponse> gateOuts = Arrays.asList(gateOutResponse);
+                List<GateOutResponse> gateOuts = singletonList(gateOutResponse);
                 when(gateOutService.listGateOuts(anyList())).thenReturn(gateOuts);
 
                 // When/Then
@@ -120,7 +126,8 @@ class GateOutControllerTest {
         }
 
         @Test
-        void getGateOut_ShouldReturnGateOutById() throws Exception {
+        @SneakyThrows
+        void ShouldReturnGateOutById() {
                 // Given
                 when(gateOutService.getGateOutById(eq(1L))).thenReturn(gateOutResponse);
 
@@ -135,7 +142,8 @@ class GateOutControllerTest {
         }
 
         @Test
-        void confirmGateOut_ShouldReturnConfirmedGateOut() throws Exception {
+        @SneakyThrows
+        void ShouldReturnConfirmedGateOut() {
                 // Given
                 GateOutResponse confirmedResponse = GateOutResponse.builder()
                                 .id(1L)
@@ -155,7 +163,8 @@ class GateOutControllerTest {
         }
 
         @Test
-        void attachRFIDTags_ShouldReturnUpdatedGateOut() throws Exception {
+        @SneakyThrows
+        void ShouldReturnUpdatedGateOutWithAttachRFIDTags() {
                 // Given
                 AttachRFIDTagsRequest rfidRequest = AttachRFIDTagsRequest.builder()
                                 .rfidTags(Arrays.asList("RFID-001", "RFID-002"))
